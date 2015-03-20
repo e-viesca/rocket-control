@@ -34,7 +34,7 @@ M = 5.9736e24;
 k = 0.001; % to be played with
 
 % angular rotation speed of the earth
-w = [0; 0; 0]; %7.27e-5];
+w = [0; 0; 7.27e-5];
 
 %========
 % ROCKET
@@ -46,10 +46,10 @@ Lat = (90-36.84) * (pi/180);
 Lon = (2.46) * (pi/180);
 %Lat = (0) * (pi/180); 
 %Lon = (0) * (pi/180);
-r0 = [R * sin(Lat) * cos(Lon); R * sin(Lat) * sin(Lon); R * cos(Lat)];
+r0 = R * [sin(Lat) * cos(Lon); sin(Lat) * sin(Lon); cos(Lat)];
 
-AlphaV = (90-  45  ) * (pi/180);
-AlphaH = (     45  ) * (pi/180);
+AlphaV = (90-  90  ) * (pi/180);
+AlphaH = (     30  ) * (pi/180);
 
 e1 = r0 ./ norm(r0);
 e2 = R * [ cos(Lat) * cos(Lon); cos(Lat) * sin(Lon); -sin(Lat)];
@@ -57,8 +57,8 @@ e2 = e2./norm(e2);
 e3 = R * [-sin(Lat) * sin(Lon); sin(Lat) * cos(Lon);     0    ];
 e3 = e3./norm(e3);
 
-v0 = 1 * [sin(AlphaV) * cos(AlphaH); sin(AlphaV) * sin(AlphaH); cos(AlphaV)];
-%%%%%v0 = [e1, e2, e3] * v0;
+v0 = 7000 * [sin(AlphaV) * cos(AlphaH); sin(AlphaV) * sin(AlphaH); cos(AlphaV)];
+v0 = [e3, e2, e1] * v0;
 
 %=============
 % INTEGRATION
@@ -92,19 +92,36 @@ g = @(r,v,t) (v);
 h = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t) + aC(r,v,t));
 
 [r,v,t] = rocketRK2(g,h,r0,v0,t0,tN,N);
+
+hF = @(r,v,t) (ag(r,v,t) + ac(r,v,t) + aC(r,v,t));
+[rF,vF,tF] = rocketRK2(g,hF,r0,v0,t0,tN,N);
+
+hCe = @(r,v,t) (ag(r,v,t) + af(r,v,t) + aC(r,v,t));
+[rCe,vCe,tCe] = rocketRK2(g,hCe,r0,v0,t0,tN,N);
+
+hCo = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t));
+[rCo,vCo,tCo] = rocketRK2(g,hCo,r0,v0,t0,tN,N);
 %===============
 % VISUALISATION
 %===============
-quiver3(0,0,0,v0(1),v0(2),v0(3))
-%%
+
 figure(1)
 hold on
 
 % plot starting point
-plot3(r0(1),r0(2),r0(3),'rx','MarkerSize',20,'LineWidth',3)
+plot3(r0(1),r0(2),r0(3),'rx','MarkerSize',20,'LineWidth',3), hold on
 
 % plot trajectory
-plot3(r(1,:),r(2,:),r(3,:),'.','LineWidth',20)
+plot3(r(1,:),r(2,:),r(3,:),'b.','LineWidth',20), hold on
+
+% plot trajectory without friction
+plot3(rF(1,:),rF(2,:),rF(3,:),'g.','LineWidth',20), hold on
+
+% plot trajectory without centripetal 
+plot3(rCe(1,:),rCe(2,:),rCe(3,:),'k.','LineWidth',20), hold on
+
+% plot trajectory without Coriolis
+plot3(rCo(1,:),rCo(2,:),rCo(3,:),'y.','LineWidth',20)
 
 % plot Earth
 [x,y,z] = sphere(30);
