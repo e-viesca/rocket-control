@@ -41,15 +41,14 @@ w = [0; 0; 7.27e-5];
 %========
 
 % Initial conditions
-% Almeria: N36º 50' 17'' W2º 27' 35''
+% Almeria: 36º 50' 17'' N   2º 27' 35'' W
 Lat = (90-36.84) * (pi/180); 
-Lon = (2.46) * (pi/180);
-%Lat = (0) * (pi/180); 
-%Lon = (0) * (pi/180);
+Lon = (  -02.46) * (pi/180);
+
 r0 = R * [sin(Lat) * cos(Lon); sin(Lat) * sin(Lon); cos(Lat)];
 
-AlphaV = (90-  90  ) * (pi/180);
-AlphaH = (     30  ) * (pi/180);
+AlphaV = (90-  30  ) * (pi/180);
+AlphaH = (     45  ) * (pi/180);
 
 e1 = r0 ./ norm(r0);
 e2 = R * [ cos(Lat) * cos(Lon); cos(Lat) * sin(Lon); -sin(Lat)];
@@ -64,7 +63,7 @@ v0 = [e3, e2, e1] * v0;
 % INTEGRATION
 %=============
 t0 = 0;
-tN = 2*norm(v0)/(G*M/R^2);
+tN = 1.1*(2*norm(v0)/(G*M/R^2));
 N = 10000;
 
 %===============
@@ -93,18 +92,19 @@ h = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t) + aC(r,v,t));
 
 [r,v,t] = rocketRK2(g,h,r0,v0,t0,tN,N);
 
+% tN multiplied by 1.3 so that the rocket can "land"
 hF = @(r,v,t) (ag(r,v,t) + ac(r,v,t) + aC(r,v,t));
-[rF,vF,tF] = rocketRK2(g,hF,r0,v0,t0,tN,N);
+[rF,vF,tF] = rocketRK2(g,hF,r0,v0,t0,tN*1.3,N);
 
 hCe = @(r,v,t) (ag(r,v,t) + af(r,v,t) + aC(r,v,t));
 [rCe,vCe,tCe] = rocketRK2(g,hCe,r0,v0,t0,tN,N);
 
 hCo = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t));
 [rCo,vCo,tCo] = rocketRK2(g,hCo,r0,v0,t0,tN,N);
+
 %===============
 % VISUALISATION
 %===============
-
 figure(1)
 hold on
 
@@ -123,9 +123,37 @@ plot3(rCe(1,:),rCe(2,:),rCe(3,:),'k.','LineWidth',20), hold on
 % plot trajectory without Coriolis
 plot3(rCo(1,:),rCo(2,:),rCo(3,:),'y.','LineWidth',20)
 
+
 % plot Earth
 [x,y,z] = sphere(30);
 mesh(R*x,R*y,R*z)
 colormap([0 0 0])
 view(-180,20)
 axis equal
+
+%==============
+% CALCULATIONS
+%==============
+
+i=2;
+while norm(r(:,i))>R
+    i=i+1;
+end
+
+iF=2;
+while norm(rF(:,iF))>R
+    iF=iF+1;
+end
+dF = norm((rF(:,iF))-(r(:,i)));
+
+iCe=2;
+while norm(rCe(:,iCe))>R
+    iCe=iCe+1;
+end
+dCe = norm((rCe(:,iCe))-(r(:,i)));
+
+iCo=2;
+while norm(rCo(:,iCo))>R
+    iCo=iCo+1;
+end
+dCo = norm((rCo(:,iCo))-(r(:,i)));
