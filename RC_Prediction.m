@@ -94,7 +94,7 @@ dmdt = @(t) ();
 g = @(r,v,t) (v);
 h = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t) + aC(r,v,t));
 
-[r,v,t] = predictionRK2(g,h,r0,rN,t0,tN,N);
+[r,v,t] = RC_predictionRK2(g,h,r0,rN,t0,tN,N);
 
 %===============
 % VISUALISATION

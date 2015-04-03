@@ -1,5 +1,5 @@
-function [ r,v,t ] = predictionRK2( g, h, r0, rN, t0, tN, N )
-%predictionRK2 Summary of this function goes here
+function [ r,v,t ] = RC_RK2( g, h, r0, v0, t0, tN, N )
+%rocketRK2 Summary of this function goes here
 %   Detailed explanation goes here
 
 % initialisation block
@@ -13,7 +13,7 @@ r    = [zeros(1,N);zeros(1,N);zeros(1,N)];
 v    = [zeros(1,N);zeros(1,N);zeros(1,N)];
 %t(1) = t0; this is automatically initialized by linspace()
 r(:,1) = r0;
-r(:,N) = rN;
+v(:,1) = v0;
 
 
 % integration block
