@@ -19,21 +19,17 @@ GNU General Public License v2.0
 
 %==========================================================================
 %                             ROCKET CONTROL
-%                Rocket deviation as a function of angle.
+%             Travel distance as a function of air friction.
 %==========================================================================
-% Here we are going to use a loop to plot the deviations caused by the
-% Coriolis and centripetal accelerations a function of the different
-% launch directions.
+% Here we are going to use a loop to plot the travel distance as a function
+% of a range of possible coefficients of air friction.
+% ATTENTION: Prolonged running time (~2 mins).
+
+tic;
 
 clear all
 close all
 clc
-
-% We load the previous data from the Almeria launch
-% script, for comparison pourposes.
-S = load('RC_dCedCoAlm.mat');
-dCeAlm = S.dCe;
-dCoAlm = S.dCo;
 
 %=======
 % EARTH
@@ -44,36 +40,37 @@ G = 6.667e-11;
 R = 6371009;
 M = 5.9736e24;
 
-% air friction
-k = 0.001;
-
 % angular rotation speed of the earth
 w = [0; 0; 7.27e-5];
 
-% initialise index to acces the data later
-I2 = 1;
-% memory allocation for deviation data
-dCe = zeros(1,5);
-dCo = zeros(1,5);
+% loop iterations
+n = 100;
 
-% as the deviations are constant, and for performance sake, we are only
-% going to calculate five angles, 0º 90º 180º 270º and 360º=0º.
-for I = 0:90:360
+% air friction
+k0 = 0.0006;
+k  = k0;
+kN = 0.05;
+dk = (kN-k0)/n;
+
+% memory allocation for distance data
+dR = zeros(1,n);
+
+% we calculate the distance for each one of the n-different k's
+for I = 1:n;
     
     %========
     % ROCKET
     %========
     
-    % Initial conditions: North Pole: 90º N  0º W
-    % For some strange reason, if we put exactly 90º, trajectory doesn't
-    % show up, so this approximation is used here.
-    Lat = (90- 89.999999 ) * (pi/180);
-    Lon = ( 0 ) * (pi/180);
+    % Initial conditions
+    % Almeria: 36º 50' 17'' N   2º 27' 35'' W
+    Lat = (90-36.84) * (pi/180);
+    Lon = (  -02.46) * (pi/180);
     
     r0 = R * [sin(Lat) * cos(Lon); sin(Lat) * sin(Lon); cos(Lat)];
     
-    AlphaV = (90-  30  ) * (pi/180);
-    AlphaH = (      I  ) * (pi/180);
+    AlphaV = (90-  45  ) * (pi/180);
+    AlphaH = (     45  ) * (pi/180);
     
     e1 = r0 ./ norm(r0);
     e2 = R * [ cos(Lat) * cos(Lon); cos(Lat) * sin(Lon); -sin(Lat)];
@@ -103,6 +100,7 @@ for I = 0:90:360
     % Coriolis force
     aC =  @(r,v,t) (-cross(2.*w, v) );
     
+    
     %========================
     % DIFFERENTIAL EQUATIONS
     %========================
@@ -111,53 +109,29 @@ for I = 0:90:360
     
     [r,v,t] = RC_RK2(g,h,r0,v0,t0,tN,N);
     
-    hCe = @(r,v,t) (ag(r,v,t) + af(r,v,t) + aC(r,v,t));
-    [rCe,vCe,tCe] = RC_RK2(g,hCe,r0,v0,t0,tN,N);
     
-    hCo = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t));
-    [rCo,vCo,tCo] = RC_RK2(g,hCo,r0,v0,t0,tN,N);
-        
     %==============
     % CALCULATIONS
     %==============
     
-    % we calculate when the rocket lands, then we calculate the actual
-    % distance between two shots.    
+    % we calculate when does the rocket land, then we calculate the
+    % distance to the launching site.
     i=2;
     while norm(r(:,i))>R
         i=i+1;
     end
     
-    iCe=2;
-    while norm(rCe(:,iCe))>R
-        iCe=iCe+1;
-    end
-    dCe(I2) = norm((rCe(:,iCe))-(r(:,i)));
+    dR(I) = norm((r(:,1))-(r(:,i)));
     
-    iCo=2;
-    while norm(rCo(:,iCo))>R
-        iCo=iCo+1;
-    end
-    dCo(I2) = norm((rCo(:,iCo))-(r(:,i)));
-    
-    I2 = I2 + 1;
+    k = k + dk;
     
 end
 
-aH = linspace(0,360,5);
-aHAlm = linspace(0,360,361);
+K = linspace(k0,k,n);
 
-figure(1)
-plot(aHAlm, dCeAlm,'r'), hold on
-plot(aH, dCe,'b')
-    title('Desviación sin aceleración centrípeta')
-    xlabel('Dirección de lanzamiento [grados]')
+figure(1), plot(K, dR,'r')
+    title('Distancia recorrida en función del coeficiente de rozamiento')
+    xlabel('k')
     ylabel('Distancia [m]')
-    legend('Lanzamiento desde Almería','Lanzamiento desde polo norte')
-figure(2)
-plot(aHAlm, dCoAlm,'r'), hold on
-plot(aH, dCo,'b')
-    title('Desviación sin aceleración de Coriolis')
-    xlabel('Dirección de lanzamiento [grados]')
-    ylabel('Distancia [m]')
-    legend('Lanzamiento desde Almería','Lanzamiento desde polo norte','Location','best')
+
+toc

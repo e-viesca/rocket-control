@@ -1,6 +1,6 @@
 function [ r,v,t ] = RC_RK2( g, h, r0, v0, t0, tN, N )
-%rocketRK2 Summary of this function goes here
-%   Detailed explanation goes here
+% RC_RK2 Modified 2nd order Runge-Kutta function for two coupled ODE.
+
 
 % initialisation block
 %----------------------

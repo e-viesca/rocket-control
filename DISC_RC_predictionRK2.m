@@ -1,6 +1,11 @@
 function [ r,v,t ] = RC_predictionRK2( g, h, r0, rN, t0, tN, N )
-%predictionRK2 Summary of this function goes here
-%   Detailed explanation goes here
+% RC_predictionRK2 Modified 2nd order Runge-Kutta function for two coupled
+% ODE.
+%==========================================================================
+%                              DISCONTINUED
+%      Failed attempt to build an inverse Runge Kutta for predictor
+%==========================================================================
+
 
 % initialisation block
 %----------------------

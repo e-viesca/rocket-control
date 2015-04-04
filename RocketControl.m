@@ -17,8 +17,13 @@ GNU General Public License v2.0
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 %}
 
-close all
+%==========================================================================
+%                             ROCKET CONTROL
+%                       Base script of the project
+%==========================================================================
+
 clear all
+close all
 clc
 
 %=======
@@ -31,7 +36,7 @@ R = 6371009;
 M = 5.9736e24;
 
 % air friction
-k = 0.001; % to be played with
+k = 0.001;
 
 % angular rotation speed of the earth
 w = [0; 0; 7.27e-5];
@@ -42,15 +47,19 @@ w = [0; 0; 7.27e-5];
 
 % Initial conditions
 % Almeria: 36º 50' 17'' N   2º 27' 35'' W
-Lat = (90-36.84) * (pi/180);
-Lon = (  -02.46) * (pi/180);
-% Lat = (90-89.9999) * (pi/180);
-% Lon = (  -02.46) * (pi/180);
+%   Lat = (90-36.84) * (pi/180);
+%   Lon = (  -02.46) * (pi/180);
+% North Pole: 90º N  0º W
+%   Lat = (90-89.9999) * (pi/180);
+%   Lon = (  0) * (pi/180);
+% Equator: 0º N  0º W
+   Lat = (90-0) * (pi/180);
+   Lon = (   0) * (pi/180);
 
 r0 = R * [sin(Lat) * cos(Lon); sin(Lat) * sin(Lon); cos(Lat)];
 
-AlphaV = (90-  45  ) * (pi/180);
-AlphaH = (     30  ) * (pi/180);
+AlphaV = (90-  30  ) * (pi/180);
+AlphaH = (     -90  ) * (pi/180);
 
 e1 = r0 ./ norm(r0);
 e2 = R * [ cos(Lat) * cos(Lon); cos(Lat) * sin(Lon); -sin(Lat)];
@@ -119,18 +128,21 @@ plot3(rCe(1,:),rCe(2,:),rCe(3,:),'k.','LineWidth',20), hold on
 % plot trajectory without Coriolis
 plot3(rCo(1,:),rCo(2,:),rCo(3,:),'y.','LineWidth',20)
 
+legend('Ecuador','original','sin fricción','sin centrípeta','sin Coriolis')
 
 % plot Earth
 [x,y,z] = sphere(30);
 mesh(R*x,R*y,R*z)
 colormap([0 0 0])
-view(-180,20)
+view(90,40)
 axis equal
 
 %==============
 % CALCULATIONS
 %==============
 
+% we calculate when the rocket lands, then we calculate the actual
+% distance between the different shots.
 i=2;
 while norm(r(:,i))>R
     i=i+1;
@@ -153,3 +165,5 @@ while norm(rCo(:,iCo))>R
     iCo=iCo+1;
 end
 dCo = norm((rCo(:,iCo))-(r(:,i)));
+
+fprintf('·Coriolis:    %f [m]\n·Centrípeta: %f [m]\n·Fricción:    %f [m]\n',dCo,dCe,dF);

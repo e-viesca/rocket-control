@@ -1,3 +1,8 @@
+%==========================================================================
+%                              DISCONTINUED
+%                           Earth skins tests.
+%==========================================================================
+
 % plot Earth
 load earth % load image data, X, and colormap, map
 sphere; h = findobj('Type','surface');

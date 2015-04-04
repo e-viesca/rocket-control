@@ -17,12 +17,18 @@ GNU General Public License v2.0
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 %}
 
-clear all
-clc
-
-% Here we use a loop to plot the Coriolis and centripetal deviations in
-% function of different launch directions.
+%==========================================================================
+%                             ROCKET CONTROL
+%                Rocket deviation as a function of angle.
+%==========================================================================
+% Here we are going to use a loop to plot the deviations caused by the
+% Coriolis and centripetal accelerations a function of the different
+% launch directions.
 % WARNING: Long running time (~15 mins in a 2013 MacBook Air).
+
+clear all
+close all
+clc
 
 %=======
 % EARTH
@@ -34,17 +40,17 @@ R = 6371009;
 M = 5.9736e24;
 
 % air friction
-k = 0.001; % to be played with
+k = 0.001;
 
 % angular rotation speed of the earth
 w = [0; 0; 7.27e-5];
 
-I = 0;
-I2 = 1;
+% memory allocation for deviation data
 dCe = zeros(1,361);
 dCo = zeros(1,361);
 
-while I <= 360
+% we calculate the deviation for each one of the 360º
+for I = 0:360
     
     %========
     % ROCKET
@@ -106,6 +112,8 @@ while I <= 360
     % CALCULATIONS
     %==============
     
+    % we calculate when the rocket lands, then we calculate the actual
+    % distance between two shots.
     i=2;
     while norm(r(:,i))>R
         i=i+1;
@@ -115,18 +123,18 @@ while I <= 360
     while norm(rCe(:,iCe))>R
         iCe=iCe+1;
     end
-    dCe(I2) = norm((rCe(:,iCe))-(r(:,i)));
+    dCe(I+1) = norm((rCe(:,iCe))-(r(:,i)));
     
     iCo=2;
     while norm(rCo(:,iCo))>R
         iCo=iCo+1;
     end
-    dCo(I2) = norm((rCo(:,iCo))-(r(:,i)));
-
-    I = I + 1;
-    I2 = I2 + 1;
+    dCo(I+1) = norm((rCo(:,iCo))-(r(:,i)));
     
 end
+
+% we save the data to save us calculate them again in the other two scripts
+save('RC_dCedCoAlm.mat','dCe','dCo');
 
 aH = linspace(0,360,361);
 

@@ -20,6 +20,11 @@ function varargout = gui(varargin)
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
+%==========================================================================
+%                              DISCONTINUED
+%                     Failed attempt to build a GUI.
+%==========================================================================
+
 % Edit the above text to modify the response to help gui
 
 % Last Modified by GUIDE v2.5 13-Mar-2015 12:20:46

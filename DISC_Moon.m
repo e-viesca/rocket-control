@@ -17,6 +17,11 @@ GNU General Public License v2.0
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 %}
 
+%==========================================================================
+%                              DISCONTINUED
+%                    Rocket Control for the Moon data
+%==========================================================================
+
 close all
 clear all
 clc
@@ -76,7 +81,7 @@ af = @(r,v,t) ( -k .* v);
 % centripetal force
 ac = @(r,v,t) ( cross(w, cross(w, r)) );
 % Coriolis force
-aC =  @(r,v,t) ( cross(2.*w, v) );
+aC =  @(r,v,t) (-cross(2.*w, v) );
 
 %{
 % propulsion (NO NO for now)
