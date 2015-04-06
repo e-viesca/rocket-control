@@ -124,25 +124,47 @@ h = @(r3,v3,t) (ag(r3,v3,t) + af(r3,v3,t) + ac(r3,v3,t) + aC(r3,v3,t));
 % PLOTTING
 %==========
 n = linspace(1,N,N);
+
 V1 = zeros(1,length(v1));
 % perhaps not the more efficient nor the more elegant way, but we had
 % problems using index vectors and 'norm' not returning a vector
 for i=1:length(v1)
    V1(i) = norm(v1(:,i)); 
 end
-plot(n, V1,'r'), hold on
+I1=2;
+while norm(r1(:,I1))>R
+    I1 = I1 + 1;
+end
+V1(I1:length(V1)) = [];
+t1 = t;
+t1(I1:length(t1)) = [];
+plot(t1, V1,'r'), hold on
 
 V2 = zeros(1,length(v2));
 for i=1:length(v2)
    V2(i) = norm(v2(:,i)); 
 end
-plot(n, V2,'b'), hold on
+I2=2;
+while norm(r2(:,I2))>R
+    I2 = I2 + 1;
+end
+V2(I2:length(V2)) = [];
+t2 = t;
+t2(I2:length(t2)) = [];
+plot(t2, V2,'b'), hold on
 
 V3 = zeros(1,length(v3));
 for i=1:length(v2)
    V3(i) = norm(v3(:,i)); 
 end
-plot(n, V3,'k'), hold on
+I3=2;
+while norm(r3(:,I3))>R
+    I3 = I3 + 1;
+end
+V3(I3:length(V3)) = [];
+t3 = t;
+t3(I3:length(t3)) = [];
+plot(t3, V3,'k'), hold on
 
 title('Velocidad en función del tiempo para k1, k2 y k3')
 xlabel('Tiempo [s]')

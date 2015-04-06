@@ -50,16 +50,16 @@ w = [0; 0; 7.27e-5];
 %   Lat = (90-36.84) * (pi/180);
 %   Lon = (  -02.46) * (pi/180);
 % North Pole: 90º N  0º W
-%   Lat = (90-89.9999) * (pi/180);
-%   Lon = (  0) * (pi/180);
+  Lat = (90-89.9999) * (pi/180);
+  Lon = (  0) * (pi/180);
 % Equator: 0º N  0º W
-   Lat = (90-0) * (pi/180);
-   Lon = (   0) * (pi/180);
+%    Lat = (90-0) * (pi/180);
+%    Lon = (   0) * (pi/180);
 
 r0 = R * [sin(Lat) * cos(Lon); sin(Lat) * sin(Lon); cos(Lat)];
 
 AlphaV = (90-  30  ) * (pi/180);
-AlphaH = (     -90  ) * (pi/180);
+AlphaH = (     45  ) * (pi/180);
 
 e1 = r0 ./ norm(r0);
 e2 = R * [ cos(Lat) * cos(Lon); cos(Lat) * sin(Lon); -sin(Lat)];

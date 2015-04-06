@@ -18,7 +18,7 @@ GNU General Public License v2.0
 %}
 
 %==========================================================================
-%                              DISCONTINUED
+%                             ROCKET CONTROL
 %                    Rocket Control for the Moon data
 %==========================================================================
 
@@ -46,14 +46,13 @@ w = [0; 0; 2.66e-6];
 %========
 
 % Initial conditions
-% Almeria: 36º 50' 17'' N   2º 27' 35'' W
-Lat = (90-36.84) * (pi/180); 
-Lon = (  -02.46) * (pi/180);
+Lat = (90-0) * (pi/180); 
+Lon = (   0) * (pi/180);
 
 r0 = R * [sin(Lat) * cos(Lon); sin(Lat) * sin(Lon); cos(Lat)];
 
-AlphaV = (90-  30  ) * (pi/180);
-AlphaH = (     45  ) * (pi/180);
+AlphaV = (90-  00  ) * (pi/180);
+AlphaH = (     00  ) * (pi/180);
 
 e1 = r0 ./ norm(r0);
 e2 = R * [ cos(Lat) * cos(Lon); cos(Lat) * sin(Lon); -sin(Lat)];
@@ -61,14 +60,14 @@ e2 = e2./norm(e2);
 e3 = R * [-sin(Lat) * sin(Lon); sin(Lat) * cos(Lon);     0    ];
 e3 = e3./norm(e3);
 
-v0 = 2000 * [sin(AlphaV) * cos(AlphaH); sin(AlphaV) * sin(AlphaH); cos(AlphaV)];
+v0 = 4500 * [sin(AlphaV) * cos(AlphaH); sin(AlphaV) * sin(AlphaH); cos(AlphaV)];
 v0 = [e3, e2, e1] * v0;
 
 %=============
 % INTEGRATION
 %=============
 t0 = 0;
-tN = 1.1*(2*norm(v0)/(G*M/R^2));
+tN = 10.0*(2*norm(v0)/(G*M/R^2));
 N = 10000;
 
 %===============
@@ -83,12 +82,6 @@ ac = @(r,v,t) ( cross(w, cross(w, r)) );
 % Coriolis force
 aC =  @(r,v,t) (-cross(2.*w, v) );
 
-%{
-% propulsion (NO NO for now)
-ap = @(r,v,t) ();
-dmdt = @(t) ();
-%}
-
 %========================
 % DIFFERENTIAL EQUATIONS
 %========================
@@ -97,15 +90,15 @@ h = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t) + aC(r,v,t));
 
 [r,v,t] = RC_RK2(g,h,r0,v0,t0,tN,N);
 
-% tN multiplied by 1.3 so that the rocket can "land"
-hF = @(r,v,t) (ag(r,v,t) + ac(r,v,t) + aC(r,v,t));
-[rF,vF,tF] = RC_RK2(g,hF,r0,v0,t0,tN,N);
-
-hCe = @(r,v,t) (ag(r,v,t) + af(r,v,t) + aC(r,v,t));
-[rCe,vCe,tCe] = RC_RK2(g,hCe,r0,v0,t0,tN,N);
-
-hCo = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t));
-[rCo,vCo,tCo] = RC_RK2(g,hCo,r0,v0,t0,tN,N);
+% % tN multiplied by a factor so that the rocket w/o friction can "land"
+% hF = @(r,v,t) (ag(r,v,t) + ac(r,v,t) + aC(r,v,t));
+% [rF,vF,tF] = RC_RK2(g,hF,r0,v0,t0, 1.0 * tN,N);
+% 
+% hCe = @(r,v,t) (ag(r,v,t) + af(r,v,t) + aC(r,v,t));
+% [rCe,vCe,tCe] = RC_RK2(g,hCe,r0,v0,t0,tN,N);
+% 
+% hCo = @(r,v,t) (ag(r,v,t) + af(r,v,t) + ac(r,v,t));
+% [rCo,vCo,tCo] = RC_RK2(g,hCo,r0,v0,t0,tN,N);
 
 %===============
 % VISUALISATION
@@ -118,15 +111,15 @@ plot3(r0(1),r0(2),r0(3),'rx','MarkerSize',20,'LineWidth',3), hold on
 
 % plot trajectory
 plot3(r(1,:),r(2,:),r(3,:),'b.','LineWidth',20), hold on
-
-% plot trajectory without friction
-plot3(rF(1,:),rF(2,:),rF(3,:),'g.','LineWidth',20), hold on
-
-% plot trajectory without centripetal 
-plot3(rCe(1,:),rCe(2,:),rCe(3,:),'k.','LineWidth',20), hold on
-
-% plot trajectory without Coriolis
-plot3(rCo(1,:),rCo(2,:),rCo(3,:),'y.','LineWidth',20)
+% 
+% % plot trajectory without friction
+% plot3(rF(1,:),rF(2,:),rF(3,:),'g.','LineWidth',20), hold on
+% 
+% % plot trajectory without centripetal 
+% plot3(rCe(1,:),rCe(2,:),rCe(3,:),'k.','LineWidth',20), hold on
+% 
+% % plot trajectory without Coriolis
+% plot3(rCo(1,:),rCo(2,:),rCo(3,:),'y.','LineWidth',20)
 
 
 % plot Earth
