@@ -12,7 +12,7 @@ All the files starting by *DISC* are no longer used or maintained scripts, most 
 Contains the complete text of the GNU General Public License v2.0.
 
 
-#### Rocket Control System
+### Rocket Control System
 
 All the files starting by *RC* are actual project, and each one of them is explained here:
 
